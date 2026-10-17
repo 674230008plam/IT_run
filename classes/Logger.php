@@ -1,6 +1,6 @@
 <?php
 /**
- * Logger — บันทึกประวัติกิจกรรมและการดำเนินงานของคำร้อง (Audit Log)
+ * Logger — บันทึก Audit Log ของระบบ
  */
 class Logger
 {
@@ -11,9 +11,6 @@ class Logger
         $this->dbConn = Database::getInstance()->getConnection();
     }
 
-    /**
-     * บันทึกLog กิจกรรมเข้าตาราง request_audit_logs
-     */
     public function log(
         int    $requestId,
         string $eventType,
@@ -40,11 +37,6 @@ class Logger
         ]);
     }
 
-    /**
-     * ดึงประวัติกิจกรรมทั้งหมดของคำร้องที่กำหนด
-     *
-     * @return array<int, array<string, mixed>>
-     */
     public function getByRequest(int $requestId): array
     {
         $stmt = $this->dbConn->prepare(

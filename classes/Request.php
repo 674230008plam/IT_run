@@ -15,12 +15,6 @@ class Request
         $this->auditLogger = new Logger();
     }
 
-    /**
-     * บันทึกยื่นคำร้องขอเปิดกลุ่มเรียนใหม่
-     *
-     * @param  array<string, mixed> $formData
-     * @return array{success: bool, request_id?: int, request_number?: string, message: string}
-     */
     public function create(array $formData): array
     {
         try {
@@ -55,7 +49,6 @@ class Request
             ]);
 
             $newRequestId = (int)$this->dbConn->lastInsertId();
-
             $this->auditLogger->log($newRequestId, 'CREATE_REQUEST', 'สร้างคำร้องขอเปิดกลุ่มเรียนพิเศษใหม่');
 
             $this->dbConn->commit();
@@ -64,7 +57,7 @@ class Request
                 'success'        => true,
                 'request_id'     => $newRequestId,
                 'request_number' => $trackingCode,
-                'message'        => 'ยื่นคำร้องสำเร็จแล้ว โปรดบันทึกรหัสติดตามคำร้องเพื่อตรวจสอบผล',
+                'message'        => 'ยื่นคำร้องสำเร็จแล้ว',
             ];
 
         } catch (\Exception $e) {
@@ -72,16 +65,11 @@ class Request
             error_log('[Request::create] Error: ' . $e->getMessage());
             return [
                 'success' => false,
-                'message' => 'เกิดข้อผิดพลาดขณะส่งคำร้อง กรุณาตรวจสอบข้อมูลและลองใหม่อีกครั้ง',
+                'message' => 'เกิดข้อผิดพลาดขณะส่งคำร้อง',
             ];
         }
     }
 
-    /**
-     * ค้นหาข้อมูลคำร้องจาก Tracking Code
-     *
-     * @return array<string, mixed>|false
-     */
     public function trackByNumber(string $trackingCode): array|false
     {
         $stmt = $this->dbConn->prepare(
@@ -91,12 +79,6 @@ class Request
         return $stmt->fetch();
     }
 
-    /**
-     * ดึงรายการคำร้องทั้งหมดพร้อมตัวกรองข้อมูล
-     *
-     * @param  array<string, mixed> $filterOptions
-     * @return array<int, array<string, mixed>>
-     */
     public function getAll(array $filterOptions = []): array
     {
         $whereClauses = [];
@@ -124,9 +106,6 @@ class Request
         return $stmt->fetchAll();
     }
 
-    /**
-     * อัปเดตสถานะการอนุมัติคำร้อง
-     */
     public function updateStatus(
         int    $requestId,
         int    $statusId,
@@ -145,7 +124,7 @@ class Request
                 ':evaluation_remark' => $evaluationRemark,
             ];
 
-            if ($statusId === 3 && $staffId !== null) { // สถานะ APPROVED
+            if ($statusId === 3 && $staffId !== null) {
                 $additionalQuery      = ', staff_id = :staff_id, approved_at = NOW()';
                 $queryParams[':staff_id'] = $staffId;
             }
@@ -162,12 +141,7 @@ class Request
             $stmt->execute($queryParams);
 
             $statusText = ($statusId === 3) ? 'อนุมัติคำร้อง' : 'ไม่อนุมัติคำร้อง';
-            $this->auditLogger->log(
-                $requestId,
-                'EVALUATE_STATUS',
-                "{$statusText}: {$evaluationRemark}",
-                $evaluatorName
-            );
+            $this->auditLogger->log($requestId, 'EVALUATE_STATUS', "{$statusText}: {$evaluationRemark}", $evaluatorName);
 
             $this->dbConn->commit();
             return true;
@@ -179,9 +153,6 @@ class Request
         }
     }
 
-    /**
-     * สร้างรหัส Tracking Code อัตโนมัติ (เช่น SCR-671-0001)
-     */
     private function generateTrackingCode(int $semester, int $academicYear): string
     {
         $yearSuffix = substr((string)$academicYear, -2);
