@@ -1,7 +1,6 @@
 <?php
 require_once __DIR__ . '/config/database.php';
 require_once __DIR__ . '/classes/Database.php';
-require_once __DIR__ . '/classes/Logger.php';
 require_once __DIR__ . '/classes/Request.php';
 require_once __DIR__ . '/includes/functions.php';
 
@@ -22,7 +21,7 @@ require_once __DIR__ . '/includes/header.php';
                 <i class="fas fa-file-signature fa-3x text-primary mb-3"></i>
                 <h4 class="card-title fw-bold">สร้างคำร้องใหม่</h4>
                 <p class="card-text text-muted">ยื่นความประสงค์ขอเปิดกลุ่มเรียนในรายวิชาที่ไม่ได้อยู่ในตารางเรียนปกติ</p>
-                <a href="/submit_request.php" class="btn btn-primary mt-3 px-4">
+                <a href="submit_request.php" class="btn btn-primary mt-3 px-4">
                     <i class="fas fa-plus-circle me-1"></i>ลงทะเบียนคำร้อง
                 </a>
             </div>
@@ -35,7 +34,7 @@ require_once __DIR__ . '/includes/header.php';
                 <i class="fas fa-search-location fa-3x text-success mb-3"></i>
                 <h4 class="card-title fw-bold">เช็กสถานะคำร้อง</h4>
                 <p class="card-text text-muted">ติดตามความคืบหน้าการอนุมัติคำร้องด้วยรหัส Tracking Code</p>
-                <a href="/track_request.php" class="btn btn-success mt-3 px-4">
+                <a href="track_request.php" class="btn btn-success mt-3 px-4">
                     <i class="fas fa-search me-1"></i>ค้นหาคำร้อง
                 </a>
             </div>
