@@ -49,4 +49,18 @@ class Request
             ];
         }
     }
+
+    public function getByTrackingCode(string $trackingCode): ?array
+    {
+        try {
+            $stmt = $this->dbConn->prepare(
+                'SELECT * FROM section_requests WHERE request_number = :request_number LIMIT 1'
+            );
+            $stmt->execute([':request_number' => $trackingCode]);
+            $result = $stmt->fetch();
+            return $result ?: null;
+        } catch (\Exception $e) {
+            return null;
+        }
+    }
 }
